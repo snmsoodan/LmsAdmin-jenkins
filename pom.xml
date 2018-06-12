@@ -11,7 +11,7 @@
 
 	<name>LMSSpringBootAdmin</name>
 	<description>Admin</description>
-
+	
 	
 	<parent>
 		<groupId>org.springframework.boot</groupId>
