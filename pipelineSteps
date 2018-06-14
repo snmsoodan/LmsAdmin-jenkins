@@ -1,0 +1,52 @@
+node {
+   stage("download")
+   {
+       git "https://github.com/snmsoodan/testLmsAdmin.git"
+
+   }
+   stage("checkout master")
+   {
+      checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'c2b8bf8c-ddec-44f0-afd9-40831a9f0f21', url: 'https://github.com/snmsoodan/testLmsAdmin.git']]])
+   }
+   stage("version update")
+   {
+       sh 'mvn -B release:update-versions'
+   }
+   stage("build")
+   {
+       sh 'mvn clean package'
+   }
+   stage("archive")
+   {
+       archiveArtifacts 'target/*.jar'
+   }
+   stage("git add")
+   {
+       sh 'git add .'
+   }
+   stage("git commit")
+   {
+       sh 'git commit -m "version updated"'
+   }
+   stage("check")
+   {
+       def a=env.GIT_USERNAME
+       echo "$a"
+   }
+   stage("git push")
+   {
+       withCredentials([usernamePassword(credentialsId: 'c2b8bf8c-ddec-44f0-afd9-40831a9f0f21', passwordVariable: 'Harman587', usernameVariable: 'snmsoodan')]) {
+         sh('git push https://snmsoodan:Harman587@github.com/snmsoodan/testLmsAdmin.git HEAD:master')
+        }
+   }
+   stage("push to s3")
+   {
+       dir('target') {
+            withAWS(credentials:'2fc62bfa-f144-4b5f-982a-9d8e19345596') {
+                 s3Upload(bucket:"lmsjar", path:'jars/', includePathPattern:'*.jar')
+            }
+            
+        }
+   }
+   
+}
