@@ -35,14 +35,14 @@ node {
    }
    stage("git push")
    {
-       withCredentials([usernamePassword(credentialsId: 'c2b8bf8c-ddec-44f0-afd9-40831a9f0f21', passwordVariable: 'Harman587', usernameVariable: 'snmsoodan')]) {
-         sh('git push https://snmsoodan:Harman587@github.com/snmsoodan/testLmsAdmin.git HEAD:master')
+       withCredentials([usernamePassword(credentialsId: 'c2b8bf8c-ddec-44f0-afd9-40831a9f0f21', passwordVariable: 'password', usernameVariable: 'username')]) {
+         sh('git push https://username:password@github.com/snmsoodan/testLmsAdmin.git HEAD:master')
         }
    }
    stage("push to s3")
    {
        dir('target') {
-            withAWS(credentials:'2fc62bfa-f144-4b5f-982a-9d8e19345596') {
+            withAWS(credentials:'creds') {
                  s3Upload(bucket:"lmsjar", path:'jars/', includePathPattern:'*.jar')
             }
             
